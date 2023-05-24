@@ -2,57 +2,57 @@ import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import SimpleLightbox from "simplelightbox";// Описаний в документації
 // Додатковий імпорт стилів
 import "simplelightbox/dist/simple-lightbox.min.css";
-
 import axios from "axios";
-axios.get('/users')
-    .then(res => {
-    console.log(res.data);
-    });
 
-const form = document.getElementById('search-form');
-const gallery = document.querySelector('.gallery');
+    // Отримання посилань на необхідні елементи DOM
+const searchForm = document.getElementById('search-form');
+const galleryContainer = document.querySelector('.gallery');
 const loadMoreBtn = document.querySelector('.load-more');
 
-let page = 1;
-let currentSearchQuery = '';
+// Ініціалізація стану
+let currentPage = 1;
+let currentQuery = '';
 
-form.addEventListener('submit', handleFormSubmit);
+// Функція для виконання HTTP-запиту до Pixabay API
+async function fetchImages(query, page) {
+    const apiKey = '36691988-31241ee49ae4977171e194e7f';
+    const perPage = 40; // Кількість зображень на сторінці
+
+    const url = `https://pixabay.com/api/?key=${apiKey}&q=${query}&image_type=photo&orientation=horizontal&safesearch=true&page=${page}&per_page=${perPage}`;
+
+    try {
+        const response = await fetch(url);
+        if (response.ok) {
+            const data = await response.json();
+            return data.hits;
+        } else {
+            throw new Error('Request failed');
+        }
+    } catch (error) {
+        console.log(error);
+        return [];
+    }
+}
+
+searchForm.addEventListener('submit', performSearch);
 loadMoreBtn.addEventListener('click', loadMoreImages);
 
-function handleFormSubmit(event) {
+function performSearch(event) {
     event.preventDefault();
-    const searchQuery = form.searchQuery.value.trim();
+    clearGallery();
 
-    if (searchQuery === '') {
+    const formData = new FormData(searchForm);
+    const query = formData.get('searchQuery');
+
+    if (query.trim() === '') {
+        Notify.failure('Please enter a search query.');
         return;
     }
 
-    currentSearchQuery = searchQuery;
-    page = 1;
-    clearGallery();
-    searchImages(searchQuery);
-}
-
-function searchImages(searchQuery) {
-    const apiKey = 'YOUR_API_KEY';
-    const url = `https://pixabay.com/api/?key=${apiKey}&q=${searchQuery}&image_type=photo&orientation=horizontal&safesearch=true&page=${page}&per_page=40`;
-
-    axios.get(url)
-        .then(response => {
-            const images = response.data.hits;
-            const totalHits = response.data.totalHits;
-
-            if (images.length === 0) {
-                showNotification('Sorry, there are no images matching your search query. Please try again.');
-            } else {
-                showNotification(`Hooray! We found ${totalHits} images.`);
-                renderImages(images);
-                showLoadMoreButton();
-            }
-        })
-        .catch(error => {
-            console.error(error);
-        });
+    currentQuery = query;
+    currentPage = 1;
+    
+    searchImages(query);
 }
 
 function renderImages(images) {
@@ -63,9 +63,22 @@ function renderImages(images) {
         fragment.appendChild(photoCard);
     }
 
-    gallery.appendChild(fragment);
+    galleryContainer.appendChild(fragment);
     initializeLightbox();
     scrollToNextGroup();
+}
+
+//функція, loadMoreImages, виконує запит на отримання наступної сторінки зображень та додає їх до галереї.
+async function loadMoreImages() {
+    currentPage += 1;
+    const image = await fetchImages(currentQuery, currentPage);
+
+    if (image.length > 0) {
+        renderImages(images);
+    } else {
+        loadMoreBtn.style.display = 'none';
+        Notify.info("We're sorry, but you've reached the end of search results.");
+    }
 }
 
 function createPhotoCard(image) {
@@ -117,33 +130,14 @@ function initializeLightbox() {
     lightbox.refresh();
 }
 
+// Функція для очищення галереї
 function clearGallery() {
-    gallery.innerHTML = '';
-}
-
-function showLoadMoreButton() {
-    loadMoreBtn.style.display = 'block';
-}
-
-function hideLoadMoreButton() {
-    loadMoreBtn.style.display = 'none';
-}
-
-function loadMoreImages() {
-    page++;
-    searchImages(currentSearchQuery);
-}
-
-function showNotification(message) {
-    Notify.info(message, {
-        timeout: 3000,
-        position: 'bottom-right',
-    });
+    galleryContainer.innerHTML = '';
 }
 
 function scrollToNextGroup() {
 
-    const { height: cardHeight } = document
+    const { height: cardHeight } = galleryContainer
         .querySelector(".gallery")
         .firstElementChild.getBoundingClientRect();
 
@@ -151,4 +145,31 @@ function scrollToNextGroup() {
         top: cardHeight * 2,
         behavior: "smooth",
     });
+}
+
+//Функція performSearch виконує пошук зображень за введеним користувачем запитом. Вона очищує галерею, виконує запит до API та відображає результати.
+async function performSearch(event) {
+    event.preventDefault();
+    clearGallery();
+
+    const formData = new FormData(searchForm);
+    const query = formData.get('searchQuery');
+
+    if (query.trim() === '') {
+        Notiflix.Notify.failure('Please enter a search query.');
+        return;
+    }
+
+    currentQuery = query;
+    currentPage = 1;
+
+    const images = await fetchImages(query, currentPage);
+
+    if (images.length > 0) {
+        renderImages(images);
+        loadMoreBtn.style.display = 'block';
+    } else {
+        loadMoreBtn.style.display = 'none';
+        Notiflix.Notify.info('Sorry, there are no images matching your search query. Please try again.');
+    }
 }

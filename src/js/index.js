@@ -24,7 +24,7 @@ refs.loadMoreButton.style.display = 'none';
 refs.searchForm.addEventListener('submit', handleSearch);
 
 // Обробка події кліку на кнопку "Завантажити ще"
-refs.loadMoreButton.addEventListener('click', handleLoadMore);
+refs.loadMoreButton.addEventListener('click', loadMoreImages);
 
 // Функція для виконання HTTP-запиту до Pixabay API
 async function fetchImages(query, page) {
@@ -65,7 +65,7 @@ async function searchImages(query) {
         const images = await fetchImages(query, currentPage);
         renderImages(images);
         if (images.length > 0) {
-            refs.loadMoreBtn.style.display = 'block';
+            refs.loadMoreButton.style.display = 'block';
         } else {
             Notify.info('Sorry, there are no images matching your search query. Please try again.');
         }
@@ -159,9 +159,9 @@ function initializeLightbox() {
 }
 
 function initialize() {
-    refs.loadMoreBtn.style.display = 'none';
+    refs.loadMoreButton.style.display = 'block';
     refs.searchForm.addEventListener('submit', performSearch);
-    refs.loadMoreBtn.addEventListener('click', loadMoreImages);
+    refs.loadMoreButton.addEventListener('click', loadMoreImages);
     initializeLightbox();
 }
 

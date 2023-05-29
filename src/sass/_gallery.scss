@@ -21,6 +21,7 @@ main {
 
 .search-form {
     margin-bottom: 20px;
+    text-align: center;
 }
 
 input[type="text"] {
@@ -58,11 +59,15 @@ button {
 }
 
 .info {
+    display: flex;
+    justify-content: center;
     margin-top: 10px;
+    font-size: smaller;
 }
 
 .info-item {
     margin-bottom: 5px;
+    text-align: center;
 }
 
 .load-more {

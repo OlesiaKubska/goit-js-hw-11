@@ -4,7 +4,7 @@ import SimpleLightbox from "simplelightbox";// Описаний в докуме�
 import "simplelightbox/dist/simple-lightbox.min.css";
 import axios from 'axios';
 import PixabayAPI from './PixabayAPI';
-import refs from './refs';
+import { refs } from './refs.js';
 
 const pixabayAPI = new PixabayAPI();
 
@@ -16,6 +16,7 @@ function clearGallery() {
 // Ініціалізація стану
 let currentPage = 1;
 let currentQuery = '';
+let totalHits = 0;
 const perPage = 40; // Кількість зображень на сторінці
 
 refs.loadMoreButton.style.display = 'none';
@@ -39,6 +40,11 @@ async function fetchImages(query, page) {
     } catch (error) {
         throw new Error('Error fetching image');
     }
+}
+
+function handleSearch(event) {
+    event.preventDefault();
+    performSearch(event);
 }
 
 // Функція для обробки події пошуку
@@ -66,11 +72,13 @@ async function searchImages(query) {
         renderImages(images);
         if (images.length > 0) {
             refs.loadMoreButton.style.display = 'block';
+            const totalHits = images[0].totalHits;
+            Notify.success("Hooray! We found ${totalHits} images.");
         } else {
-            Notify.info('Sorry, there are no images matching your search query. Please try again.');
+            Notify.info("We're sorry, but you've reached the end of search results.");
         }
     } catch (error) {
-        Notify.failure('Error fetching images. Please try again later.');
+        Notify.failure("Error fetching images. Please try again later.");
     }
 }
 
@@ -127,6 +135,7 @@ function createPhotoCard(image) {
     return card;
 }
 
+// Функція для створення елемента інформації
 function createInfoItem(label, value) {
     const item = document.createElement('p');
     item.classList.add('info-item');
@@ -134,6 +143,7 @@ function createInfoItem(label, value) {
     return item;
 }
 
+// Функція для прокручування до наступної групи зображень
 function scrollToNextGroup() {
 
     const cardHeight = refs.gallery
@@ -146,6 +156,7 @@ function scrollToNextGroup() {
     });
 }
 
+// Ініціалізація функціональності
 function initializeLightbox() {
     const lightbox = new SimpleLightbox('.gallery a', {
         captions: true,

@@ -12,7 +12,7 @@ class PixabayAPI {
     async fetchImages(searchQuery, page, perPage) {
         
         try {
-            const API_URL = `${this.baseUrl}?key=${this.apiKey}&q=${encodeURIComponent(searchQuery)}&page=${page}&per_page=${perPage}`;
+            const API_URL = `${this.BASE_URL}?key=${this.API_KEY}&q=${encodeURIComponent(searchQuery)}&page=${page}&per_page=${perPage}`;
             
             const response = await fetch(API_URL);
             

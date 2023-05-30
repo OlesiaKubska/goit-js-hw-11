@@ -6,10 +6,11 @@ class PixabayAPI {
     constructor(API_KEY) {
         this.API_KEY = API_KEY;
         this.BASE_URL = 'https://pixabay.com/api/';
+        this.perPage = 40; // Кількість зображень на сторінці
     }
 
 
-    async fetchImages(searchQuery, page, perPage) {
+    async fetchImages(searchQuery, page) {
         
         try {
             const API_URL = `${this.BASE_URL}?key=${this.API_KEY}&q=${encodeURIComponent(searchQuery)}&page=${page}&per_page=${perPage}`;

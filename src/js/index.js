@@ -135,7 +135,7 @@ function renderImages(images) {
     });
     
     lightbox.refresh();
-    
+
     scrollToNextGroup();
 }
 
@@ -146,10 +146,15 @@ function createPhotoCard(image) {
     const card = document.createElement('div');
     card.classList.add('photo-card');
 
+    const link = document.createElement('a');
+    link.href = webformatURL;
+
     const imageElement = document.createElement('img');
     imageElement.src = webformatURL;
     imageElement.alt = tags;
     imageElement.loading = 'lazy';
+
+    link.appendChild(imageElement);
 
     const info = document.createElement('div');
     info.classList.add('info');
@@ -181,9 +186,9 @@ function createInfoItem(label, value) {
 // Функція для прокручування до наступної групи зображень
 function scrollToNextGroup() {
 
-    const cardHeight = refs.gallery
-        .querySelector('.photo-card')
-        .offsetHeight;
+    const { height: cardHeight } = document
+        .querySelector(".gallery")
+        .firstElementChild.getBoundingClientRect();
 
     window.scrollBy({
         top: cardHeight * 2,

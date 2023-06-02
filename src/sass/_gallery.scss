@@ -63,11 +63,16 @@ button:focus {
     gap: 12px;
 }
 
+a {
+    text-decoration: none;
+    color: #333;
+}
+
 .photo-card {
     display: flex;
     flex-direction: column;
     width: 348px;
-    height: auto;
+    height: 100%;
     border: 1px solid #ccc;
     border-radius: 5px;
     padding: 10px;

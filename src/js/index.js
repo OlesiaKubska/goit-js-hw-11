@@ -81,13 +81,11 @@ function searchImages(query) {
                 toggleLoadMoreButton(true);
                 totalHits = images[0].totalHits;
                 Notify.success(`Hooray! We found ${totalHits} images.`); // Виведення повідомлення зі значенням totalHits
-                lightbox.refresh();
             } else {
                 toggleLoadMoreButton(false);
                 Notify.info("We're sorry, but you've reached the end of search results.");
                 lightbox.refresh();
             }
-            
         })
         .catch(() => {
             Notify.failure("Error fetching images. Please try again later.");
@@ -109,62 +107,36 @@ function loadMoreImages() {
 function renderImages(images) {
     const fragment = document.createDocumentFragment();
 
-    images.forEach((image) => {
-        const photoCard = createPhotoCard(image);
-        fragment.appendChild(photoCard);
-    });
+    images.forEach(
+        ({ largeImageURL,
+            webformatURL,
+            tags,
+            likes,
+            views,
+            comments,
+            downloads, }) => {
+            const imageHTML = `<a class="gallery__item" href="${largeImageURL}">
+                        <div class="photo-card">
+                            <img src="${webformatURL}" alt="${tags}" loading="lazy" />
+                            <div class="info">
+                                <p class="info-item"><b>Likes</b> ${likes}</p>
+                                <p class="info-item"><b>Views</b> ${views}</p>
+                                <p class="info-item"><b>Comments</b> ${comments}</p>
+                                <p class="info-item"><b>Downloads</b> ${downloads}</p>
+                            </div>
+                        </div>
+                    </a>`;
+            const tempElement = document.createElement('template');
+            tempElement.innerHTML = imageHTML;
+            fragment.appendChild(tempElement.content.firstChild);
+        }
+    );
 
     refs.gallery.appendChild(fragment);
-    
+
     lightbox.refresh();
 
     scrollToNextGroup();
-}
-
-// Функція для відображення зображень у галереї
-function createPhotoCard(image) {
-    const { webformatURL, tags, likes, views, comments, downloads } = image;
-
-    const card = document.createElement('div');
-    card.classList.add('photo-card');
-
-    const link = document.createElement('a');
-    link.href = webformatURL;
-    link.dataset.simplelightbox = 'gallery'; // атрибут для lightbox
-
-    const imageElement = document.createElement('img');
-    imageElement.src = webformatURL;
-    imageElement.alt = tags;
-    imageElement.loading = 'lazy';
-
-    link.appendChild(imageElement);
-
-    const info = document.createElement('div');
-    info.classList.add('info');
-
-    const likesInfo = createInfoItem('Likes', likes);
-    const viewsInfo = createInfoItem('Views', views);
-    const commentsInfo = createInfoItem('Comments', comments);
-    const downloadsInfo = createInfoItem('Downloads', downloads);
-
-    info.appendChild(likesInfo);
-    info.appendChild(viewsInfo);
-    info.appendChild(commentsInfo);
-    info.appendChild(downloadsInfo);
-
-    card.appendChild(imageElement);
-    card.appendChild(link);
-    card.appendChild(info);
-
-    return card;
-}
-
-// Функція для створення елемента інформації
-function createInfoItem(label, value) {
-    const item = document.createElement('p');
-    item.classList.add('info-item');
-    item.innerHTML = `<b>${label}</b> ${value}`;
-    return item;
 }
 
 // Функція для прокручування до наступної групи зображень

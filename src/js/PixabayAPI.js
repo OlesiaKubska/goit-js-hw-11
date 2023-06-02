@@ -12,11 +12,11 @@ export class PixabayAPI {
     }
     
     fetchPhotosByQuery() {
-        return axios.get(`${this.#BASE_URL}/?`, {
+        return axios.get(this.#BASE_URL, {
             params: {
-                image_type: 'photo',
+                category: 'photos',
                 orientation: 'horizontal',
-                q: this.page,
+                q: this.query,
                 per_page: this.perPage,
                 key: this.#API_KEY,
                 safesearch: true,

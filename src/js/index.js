@@ -1,9 +1,9 @@
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import SimpleLightbox from "simplelightbox";// Описаний в документації
-// Додатковий імпорт стилів
+// Додатковий імпорт стилів 
 import "simplelightbox/dist/simple-lightbox.min.css";
 import axios from 'axios';
-import PixabayAPI from './PixabayAPI';
+import { PixabayAPI } from './PixabayAPI';
 import { refs } from './refs.js';
 
 const pixabayAPI = new PixabayAPI();
@@ -19,6 +19,11 @@ let currentQuery = '';
 let totalHits = 0;
 const perPage = 40; // Кількість зображень на сторінці
 
+const lightbox = new SimpleLightbox('.gallery a', {
+    captionsData: 'alt',
+    captionDelay: 250,
+});
+
 refs.loadMoreButton.style.display = 'none';
 
 // Обробка події сабміту форми пошуку
@@ -30,7 +35,6 @@ refs.loadMoreButton.addEventListener('click', loadMoreImages);
 // Функція для виконання HTTP-запиту до Pixabay API
 async function fetchImages(query, page) {
     const API_KEY = '36691988-31241ee49ae4977171e194e7f';
-    const perPage = 40;
     const API_URL = `https://pixabay.com/api/?key=${API_KEY}&q=${encodeURIComponent(query)}&page=${page}&per_page=${perPage}`;
 
     try {
@@ -69,42 +73,25 @@ function handleSearch(event) {
     searchImages(query);
 }
 
-// Функція для обробки події пошуку
-function performSearch(event) {
-    event.preventDefault();
-    toggleLoadMoreButton(false);
-    clearGallery();
-
-    const formData = new FormData(refs.searchForm);
-    const query = formData.get('searchQuery');
-
-    if (query.trim() === '') {
-        Notify.failure('Please enter a search query.');
-        return;
-    }
-
-    currentQuery = query;
-    currentPage = 1;
-    
-    searchImages(query);
-}
-
-async function searchImages(query) {
-    try {
-        const images = await fetchImages(query, currentPage, 40);
-        renderImages(images);
-        
-        if (images.length > 0) {
-            toggleLoadMoreButton(true);
-            const totalHits = images[0].totalHits;
-            Notify.success(`Hooray! We found ${totalHits} images.`); // Виведення повідомлення зі значенням totalHits
-        } else {
-            toggleLoadMoreButton(false);
-            Notify.info("We're sorry, but you've reached the end of search results.");
-        }
-    } catch (error) {
-        Notify.failure("Error fetching images. Please try again later.");
-    }
+function searchImages(query) {
+    fetchImages(query, currentPage)
+        .then(images => {
+            renderImages(images);
+            if (images.length > 0) {
+                toggleLoadMoreButton(true);
+                totalHits = images[0].totalHits;
+                Notify.success(`Hooray! We found ${totalHits} images.`); // Виведення повідомлення зі значенням totalHits
+                lightbox.refresh();
+            } else {
+                toggleLoadMoreButton(false);
+                Notify.info("We're sorry, but you've reached the end of search results.");
+                lightbox.refresh();
+            }
+            
+        })
+        .catch(() => {
+            Notify.failure("Error fetching images. Please try again later.");
+        });
 }
 
 //функція, loadMoreImages, виконує запит на отримання наступної сторінки зображень та додає їх до галереї.
@@ -128,11 +115,6 @@ function renderImages(images) {
     });
 
     refs.gallery.appendChild(fragment);
-
-    const lightbox = new SimpleLightbox('.gallery a', {
-        captionsData: 'alt',
-        captionDelay: 250,
-    });
     
     lightbox.refresh();
 
@@ -148,6 +130,7 @@ function createPhotoCard(image) {
 
     const link = document.createElement('a');
     link.href = webformatURL;
+    link.dataset.simplelightbox = 'gallery'; // атрибут для lightbox
 
     const imageElement = document.createElement('img');
     imageElement.src = webformatURL;
@@ -170,6 +153,7 @@ function createPhotoCard(image) {
     info.appendChild(downloadsInfo);
 
     card.appendChild(imageElement);
+    card.appendChild(link);
     card.appendChild(info);
 
     return card;
@@ -196,24 +180,9 @@ function scrollToNextGroup() {
     });
 }
 
-// Ініціалізація функціональності
-function initializeLightbox() {
-    const lightbox = new SimpleLightbox('.gallery a', {
-        captions: true,
-        captionsData: 'alt',
-        captionPosition: 'bottom',
-        captionDelay: 250,
-        fadeSpeed: 400,
-    });
-
-    lightbox.refresh();
-}
-
 function initialize() {
     toggleLoadMoreButton(false);
-    refs.searchForm.addEventListener('submit', performSearch);
-    refs.loadMoreButton.addEventListener('click', loadMoreImages);
-    initializeLightbox();
+    clearGallery();
 }
 
 initialize();

@@ -23,6 +23,12 @@ main {
     padding: 20px;
 }
 
+img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
 .search-form {
     margin: 20px;
     text-align: center;
@@ -39,28 +45,37 @@ button {
     padding: 10px 20px;
     background-color: #333;
     color: #fff;
-    border: none;
+    border: 1px solid #ccc;
     border-radius: 5px;
     cursor: pointer;
 }
 
+button:hover,
+button:focus {
+    background-color: #fff;
+    color: #333;
+}
+
 .gallery {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
 }
 
 .photo-card {
+    display: flex;
+    flex-direction: column;
+    width: 348px;
+    height: auto;
     border: 1px solid #ccc;
     border-radius: 5px;
     padding: 10px;
 }
 
 .photo-card img {
-    display: block;
-    width: 100%;
-    height: auto;
     border-radius: 5px;
+    height: 100%;
 }
 
 .info {
@@ -73,8 +88,6 @@ button {
 .info-item {
     margin-bottom: 5px;
     text-align: center;
-    width: 100%;
-    height: 100%;
 }
 
 .load-more {
@@ -83,7 +96,7 @@ button {
     padding: 10px 20px;
     background-color: #333;
     color: #fff;
-    border: none;
+    border: 1px solid #ccc;
     border-radius: 5px;
     cursor: pointer;
 }

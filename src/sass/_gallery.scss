@@ -6,6 +6,7 @@ body {
     margin: 0;
     padding: 0;
     text-align: center;
+    scroll-behavior: smooth;
 }
 
 header {
@@ -93,6 +94,12 @@ a {
 .info-item {
     margin-bottom: 5px;
     text-align: center;
+}
+
+.is-hidden {
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
 }
 
 .load-more {

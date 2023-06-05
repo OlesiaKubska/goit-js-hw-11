@@ -12,11 +12,12 @@ export class PixabayAPI {
     }
     
     fetchPhotosByQuery() {
-        return axios.get(this.#BASE_URL, {
+        return axios.get(`${this.#BASE_URL}/?`, {
             params: {
-                category: 'photos',
+                image_type: 'photo',
                 orientation: 'horizontal',
                 q: this.query,
+                page: this.page,
                 per_page: this.perPage,
                 key: this.#API_KEY,
                 safesearch: true,
@@ -24,32 +25,3 @@ export class PixabayAPI {
         });
     }
 }
-
-// const API_KEY = '36691988-31241ee49ae4977171e194e7f';
-
-// class PixabayAPI {
-    
-//     }
-
-
-//     async fetchImages(searchQuery, page) {
-        
-//         try {
-//             const API_URL = `${this.BASE_URL}?key=${this.API_KEY}&q=${encodeURIComponent(searchQuery)}&page=${page}&per_page=${perPage}`;
-            
-//             const response = await fetch(API_URL);
-            
-//             if (!response.ok) {
-//                 throw new Error('Unable to fetch images from Pixabay API.');
-//             }
-
-//             const data = await response.json();
-//             return data;
-//         } catch (error) {
-//             console.error(error);
-//             throw error;
-//         }
-//     }
-// }
-
-// export default PixabayAPI;

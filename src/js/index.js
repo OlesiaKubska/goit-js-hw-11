@@ -61,12 +61,6 @@ async function searchImages() {
             Notify.success(`Hooray! We found ${totalHits} images.`); // Виведення повідомлення зі значенням totalHits
         }
         
-        if (isEndOfResults(totalHits)) {
-            Notify.info("We're sorry, but you've reached the end of search results.");
-            hideLoadMoreButton();
-            return;
-        }
-        
         if (totalHits > pixabayAPI.perPage) {
             showLoadMoreButton();
         }

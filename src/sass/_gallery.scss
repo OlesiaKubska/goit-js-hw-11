@@ -86,12 +86,18 @@ a {
 
 .info {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
+    align-items: center;
     margin-top: 10px;
     font-size: smaller;
+    gap: 12px;
 }
 
 .info-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
     margin-bottom: 5px;
     text-align: center;
 }

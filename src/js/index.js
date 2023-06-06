@@ -86,7 +86,7 @@ function hideLoadMoreButton() {
 
 //функція, loadMoreImages, виконує запит на отримання наступної сторінки зображень та додає їх до галереї.
 async function loadMoreImages() {
-    if (isEndOfResults()) {
+    if (isEndOfResults(totalHits)) {
         Notify.info("We're sorry, but you've reached the end of search results.");
         hideLoadMoreButton();
         return;

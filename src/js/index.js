@@ -61,8 +61,9 @@ async function searchImages() {
             Notify.success(`Hooray! We found ${totalHits} images.`); // Виведення повідомлення зі значенням totalHits
         }
         
-        if (isEndOfResults()) {
+        if (isEndOfResults(totalHits)) {
             Notify.info("We're sorry, but you've reached the end of search results.");
+            hideLoadMoreButton();
             return;
         }
         
@@ -80,14 +81,14 @@ function showLoadMoreButton() {
 }
 
 function hideLoadMoreButton() {
-    const loadMoreButton = document.querySelector('.load-more');
-    loadMoreButton.classList.add('is-hidden');
+    refs.loadMoreButton.classList.add('is-hidden');
 }
 
 //функція, loadMoreImages, виконує запит на отримання наступної сторінки зображень та додає їх до галереї.
 async function loadMoreImages() {
     if (isEndOfResults()) {
         Notify.info("We're sorry, but you've reached the end of search results.");
+        hideLoadMoreButton();
         return;
     }
     pixabayAPI.page++;
@@ -98,7 +99,6 @@ async function loadMoreImages() {
     } catch (error) {
         Notify.failure("Error fetching images. Please try again later.");
     }
-    
 }
 
 // Функція для очищення галереї
@@ -128,16 +128,6 @@ function scrollToNextGroup() {
         behavior: "smooth",
     });
 }
-
-window.addEventListener('scroll', () => {
-    const scrollTrigger = document.querySelector('#scroll-trigger');
-    const triggerPosition = scrollTrigger.getBoundingClientRect().top;
-
-    // Завантаження наступної групи зображень, якщо користувач доскролив до маркера
-    if (triggerPosition <= window.innerHeight) {
-        loadMoreImages();
-    }
-});
 
 function initialize() {
     clearGallery();

@@ -20,7 +20,6 @@ export class PixabayAPI {
                 page: this.page,
                 per_page: this.perPage,
                 key: this.#API_KEY,
-                safesearch: true,
             },
         });
     }

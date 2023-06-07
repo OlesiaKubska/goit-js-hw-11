@@ -38,14 +38,14 @@ async function handleSearch(event) {
 
     pixabayAPI.query = query;
     pixabayAPI.page = 1;
-    refs.loadMoreButton.classList.add('is-hidden');
+    hideLoadMoreButton();
 
     clearGallery();
-    searchImages();
+    await searchImages();
 }
 
 // Функція для перевірки, чи досягнуто кінця колекції зображень
-function isEndOfResults(totalHits) {
+function isEndOfResults() {
     return pixabayAPI.page * pixabayAPI.perPage >= totalHits;
 }
 
@@ -53,15 +53,19 @@ async function searchImages() {
     
     try {
         const response = await pixabayAPI.fetchPhotosByQuery();
-        const { hits, total } = response.data;
-        totalHits = total;
+        const { hits, totalHits: newTotalHits } = response.data;
+        
+        totalHits = newTotalHits;
         renderImages(hits);
 
         if (pixabayAPI.page === 1) {
             Notify.success(`Hooray! We found ${totalHits} images.`); // Виведення повідомлення зі значенням totalHits
         }
         
-        if (totalHits > pixabayAPI.perPage) {
+        if (isEndOfResults()) {
+            hideLoadMoreButton();
+            
+        } else {
             showLoadMoreButton();
         }
     } catch (error) {
@@ -70,8 +74,7 @@ async function searchImages() {
 }
     
 function showLoadMoreButton() {
-    const loadMoreButton = document.querySelector('.load-more');
-    loadMoreButton.classList.remove('is-hidden');
+    refs.loadMoreButton.classList.remove('is-hidden');
 }
 
 function hideLoadMoreButton() {
@@ -80,16 +83,21 @@ function hideLoadMoreButton() {
 
 //функція, loadMoreImages, виконує запит на отримання наступної сторінки зображень та додає їх до галереї.
 async function loadMoreImages() {
-    if (isEndOfResults(totalHits)) {
-        Notify.info("We're sorry, but you've reached the end of search results.");
-        hideLoadMoreButton();
-        return;
-    }
+    // if (isEndOfResults()) {
+    //     Notify.info("We're sorry, but you've reached the end of search results.");
+    //     hideLoadMoreButton();
+    //     return;
+    // }
     pixabayAPI.page++;
     try {
         const response = await pixabayAPI.fetchPhotosByQuery();
         const { hits } = response.data;
         renderImages(hits);
+
+        if (isEndOfResults()) {
+            hideLoadMoreButton();
+            Notify.info("We're sorry, but you've reached the end of search results.");
+        }
     } catch (error) {
         Notify.failure("Error fetching images. Please try again later.");
     }
